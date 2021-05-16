@@ -1,43 +1,5 @@
 import { getProvider } from '@decentraland/web3-provider'
-import { getUserAccount } from '@decentraland/EthereumController'
-import { RequestManager, ContractFactory } from "eth-connect"
-import UnlockABI from './abis/Unlock'
-
-executeTask(async () => {
-  try {
-    const provider = await getProvider()
-    const requestManager = new RequestManager(provider)
-    const factory = new ContractFactory(requestManager, UnlockABI)
-    const contract = (await factory.at(
-      "0x07291E2861dC4e9856f021Ee3561040da9c5d04C"
-    )) as any
-    //const address = await getUserAccount()
-    //log(address)
-
-    // Perform a function from the contract
-    //const res = await contract.getHasValidKey(address)
-
-    var address = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
-    var actualAmount = 1
-    var referrer = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
-    var data = new Array<number>();
-
-    const purchaseForOptions = { 
-      value: actualAmount,
-      from: referrer,
-      gasLimit: 500000
-    };
-
-    const transactionPromise = contract.purchase(actualAmount, address, referrer, data, purchaseForOptions);
-    
-    
-    
-    // Log response
-    // log(transactionPromise)
-  } catch (error) {
-    log(error.toString())
-  }
-})
+import {purchaseMembership} from './purchaseMembership'
 
 
 /*
@@ -110,7 +72,9 @@ function spawnCube(x: number, y: number, z: number) {
 const cube = spawnCube(8, 1, 8)
 
 cube.addComponent(
-  new OnClick(() => {
+  new OnClick(async () => {
+    const provider = await getProvider()
+    purchaseMembership(provider, "0x07291E2861dC4e9856f021Ee3561040da9c5d04C")
     cube.getComponent(Transform).scale.z *= 1.1
     cube.getComponent(Transform).scale.x *= 0.9
 
