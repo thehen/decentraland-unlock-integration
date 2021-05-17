@@ -1,53 +1,8 @@
-import { getProvider } from '@decentraland/web3-provider'
-import {purchaseMembership} from './purchaseMembership'
+import { showUnlockUI } from './unlockUI'
 
-
-/*
-const url = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
-
-const query = `
-query {
-  pairs {
-    id
-  }
-}
-`
-
-executeTask(async () => {
-  try {
-    let response = await fetch(url, {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify(query),
-    })
-    let json = await response.json()
-    log(json)
-  } catch {
-    log("failed to reach URL")
-  }
-})
-*/
-
-/// --- Set up a system ---
-
-class RotatorSystem {
-  // this group will contain every entity that has a Transform component
-  group = engine.getComponentGroup(Transform)
-
-  update(dt: number) {
-    // iterate over the entities of the group
-    for (let entity of this.group.entities) {
-      // get the Transform component of the entity
-      const transform = entity.getComponent(Transform)
-
-      // mutate the rotation
-      transform.rotate(Vector3.Up(), dt * 10)
-    }
-  }
-}
-
-// Add a new instance of the system to the engine
-engine.addSystem(new RotatorSystem())
+const LOCK = "0x07291E2861dC4e9856f021Ee3561040da9c5d04C"
+const LOGO_URL = 'images/unlock-logo-black.png'
+const BODY_TEXT = 'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.'
 
 /// --- Spawner function ---
 
@@ -73,11 +28,18 @@ const cube = spawnCube(8, 1, 8)
 
 cube.addComponent(
   new OnClick(async () => {
-    const provider = await getProvider()
-    purchaseMembership(provider, "0x07291E2861dC4e9856f021Ee3561040da9c5d04C")
-    cube.getComponent(Transform).scale.z *= 1.1
-    cube.getComponent(Transform).scale.x *= 0.9
-
-    spawnCube(Math.random() * 8 + 1, Math.random() * 8, Math.random() * 8 + 1)
+    const success =
+      await showUnlockUI(
+        LOCK,
+        LOGO_URL,
+        BODY_TEXT,
+        closeUnlockUI
+      );
   })
 )
+
+function closeUnlockUI(success: any) {
+  if (success) {
+    engine.removeEntity(cube)
+  }
+}

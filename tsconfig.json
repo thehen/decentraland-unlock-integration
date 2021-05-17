@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outFile": "./bin/game.js",
@@ -8,6 +9,15 @@
     "paths": {
       "eth-connect": [
         "node_modules/eth-connect/eth-connect.d.ts"
+      ],
+      "@dcl/ui-scene-utils": [
+        "node_modules/@dcl/ui-scene-utils/dist/index.d.ts"
+      ],
+      "@dcl/crypto-scene-utils": [
+        "node_modules/@dcl/crypto-scene-utils/dist/index.d.ts"
+      ],
+      "@dcl/ecs-scene-utils": [
+        "node_modules/@dcl/ecs-scene-utils/dist/index.d.ts"
       ]
     },
     "baseUrl": "."
