@@ -1,17 +1,32 @@
 import { getUserAccount } from '@decentraland/EthereumController'
 import { RequestManager, ContractFactory } from "eth-connect"
-import { getProvider } from '@decentraland/web3-provider'
-import * as crypto from '@dcl/crypto-scene-utils'
+import { getProvider, Provider } from '@decentraland/web3-provider'
 
 import UnlockABI from './abis/Unlock'
 
-const REFERRER = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
+const REFERRER: string = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
+
+let provider: Provider
+let requestManager: RequestManager
+let factory: ContractFactory
+
+export const initialise = async () => {
+  provider = await getProvider()
+  requestManager = new RequestManager(provider)
+  factory = new ContractFactory(requestManager, UnlockABI)
+  return
+}
+
+const getLock = async (lockAddress: string) => {
+  const lock = await factory.at(lockAddress) as any;
+  return lock;
+}
 
 export const purchaseMembership = async (lockAddress: string) => {
-  const lock = await getLock(lockAddress)
+  let lock = await getLock(lockAddress)
   const address = await getUserAccount()
-
   var actualAmount = await lock.keyPrice()
+
   var referrer = REFERRER
   var data = new Array<number>();
 
@@ -22,33 +37,19 @@ export const purchaseMembership = async (lockAddress: string) => {
   };
 
   try {
-    const transactionPromise = await lock.purchase(actualAmount, address, referrer, data, transactionOptions);
-    log("success")
+    const hash = await lock.purchase(actualAmount, address, referrer, data, transactionOptions);
+
+    // Todo add delay to polling
+    let receipt = null
+    while (receipt === null) {
+      receipt = await requestManager.eth_getTransactionReceipt(hash)
+    }
+
     return true
-  } catch {
-    log("fail")
+  } catch (error) {
+    log(error)
     return false
   }
-
-}
-
-const getLock = async (lockAddress: string) => {
-  const provider = await getProvider()
-  const requestManager = new RequestManager(provider)
-  const factory = new ContractFactory(requestManager, UnlockABI)
-  const lock = await factory.at(lockAddress) as any;
-  return lock;
-}
-
-const handleMethodCall = async (methodCall: any) => {
-  const transaction = await methodCall;
-
-  if (transaction.hash) {
-    return transaction.hash;
-  }
-
-  const finalTransaction = await transaction.wait();
-  return finalTransaction.hash; // errors fall through
 }
 
 export const getPrice = async (lockAddress: string) => {

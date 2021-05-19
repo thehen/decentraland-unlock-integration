@@ -1,3 +1,4 @@
+import { initialise } from './purchaseMembership'
 import { showUnlockUI } from './unlockUI'
 
 const LOCK = "0x07291E2861dC4e9856f021Ee3561040da9c5d04C"
@@ -28,6 +29,7 @@ const cube = spawnCube(8, 1, 8)
 
 cube.addComponent(
   new OnClick(async () => {
+    await initialise()
     const success =
       await showUnlockUI(
         LOCK,
