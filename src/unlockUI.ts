@@ -1,33 +1,56 @@
 import * as ui from '@dcl/ui-scene-utils'
-import { getPrice, getSymbol, purchaseMembership } from './purchaseMembership'
+import * as unlock from './unlock'
 
-export const showUnlockUI = async (lockAddress: string, logoUrl: string, bodyText: string, onComplete: (success: boolean) => void) => {
+export class UnlockPurchaseUI {
 
-  let success = false;
+    public lock: unlock.Lock
+    public logoUrl: string
+    public bodyText: string
 
-  let prompt = new ui.CustomPrompt(ui.PromptStyles.LIGHT)
+    private prompt: ui.CustomPrompt
 
-  let price = await getPrice(lockAddress);
-  let symbol = await getSymbol(lockAddress);
+    constructor(
+        lock: unlock.Lock,
+        logoUrl: string,
+        bodyText: string
+    ) {
+        this.lock = lock
+        this.logoUrl = logoUrl
+        this.bodyText = bodyText
+        this.prompt = new ui.CustomPrompt(ui.PromptStyles.LIGHT)
+        this.populatePrompt()
+        this.prompt.hide()
+    }
 
-  prompt.addIcon(logoUrl, 0, 120, 200, 43);
-  prompt.addText(bodyText, 0, 30, new Color4(0.5, 0.5, 0.5, 1), 13)
-  prompt.addText('Price: ' + price + ' ' + symbol, 0, -20, new Color4(0.75, 0.75, 0.75, 1), 18)
-  prompt.addText('Powered by Unlock', 0, -120, new Color4(0.5, 0.5, 0.5, 1), 10)
+    private populatePrompt = async () => {
+        this.prompt.addIcon(this.logoUrl, 0, 120, 200, 43);
+        this.prompt.addText(this.bodyText, 0, 30, new Color4(0.5, 0.5, 0.5, 1), 13)
+        this.prompt.addText('Powered by Unlock', 0, -120, new Color4(0.5, 0.5, 0.5, 1), 10)
 
-  let button1 = prompt.addButton(
-    'Purchase',
-    0,
-    -90,
-    async () => {
-      button1.hide()
-      prompt.addText('Loading...', 0, -75, new Color4(0.75, 0.75, 0.75, 1), 12)
-      success = await purchaseMembership(lockAddress)
-      prompt.hide()
-      onComplete(success)
-    },
-    ui.ButtonStyles.E
-  )
+        let button1 = this.prompt.addButton(
+            'Purchase',
+            0,
+            -90,
+            async () => {
+                button1.hide()
+                this.prompt.addText('Loading...', 0, -75, new Color4(0.75, 0.75, 0.75, 1), 12)
+                let success = await this.lock.purchaseMembership()
+                this.prompt.hide()
+                //onComplete(success)
+            },
+            ui.ButtonStyles.E
+        )
 
+        //let price = await this.lock.getPrice();
+        //let symbol = await this.lock.getSymbol();
+        //this.prompt.addText('Price: ' + price + ' ' + symbol, 0, -20, new Color4(0.75, 0.75, 0.75, 1), 18)
+    }
 
+    public show = async () => {
+        this.prompt.show()
+    }
+
+    public hide = async () => {
+        this.prompt.hide()
+    }
 }

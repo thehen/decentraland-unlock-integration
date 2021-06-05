@@ -1,47 +1,26 @@
-import { initialise } from './purchaseMembership'
-import { showUnlockUI } from './unlockUI'
+import { PadLock } from './padlock'
 
-const LOCK = "0x07291E2861dC4e9856f021Ee3561040da9c5d04C"
-const LOGO_URL = 'images/unlock-logo-black.png'
-const BODY_TEXT = 'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.'
+export let sceneMessageBus = new MessageBus()
 
-/// --- Spawner function ---
-
-function spawnCube(x: number, y: number, z: number) {
-  // create the entity
-  const cube = new Entity()
-
-  // add a transform to the entity
-  cube.addComponent(new Transform({ position: new Vector3(x, y, z) }))
-
-  // add a shape to the entity
-  cube.addComponent(new BoxShape())
-
-  // add the entity to the engine
-  engine.addEntity(cube)
-
-  return cube
-}
-
-/// --- Spawn a cube ---
-
-const cube = spawnCube(8, 1, 8)
-
-cube.addComponent(
-  new OnClick(async () => {
-    await initialise()
-    const success =
-      await showUnlockUI(
-        LOCK,
-        LOGO_URL,
-        BODY_TEXT,
-        closeUnlockUI
-      );
-  })
+const lock = new PadLock(
+  '0xBcb88eA834C300418c503ECE5dC5c9dd2dd6B978',
+  'images/unlock-logo-black.png',
+  'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.',
+  () => {
+    sceneMessageBus.emit('purchaseSuccess', {})
+    log('purchase success!')
+  },
+  () => {
+    sceneMessageBus.emit('purchaseFail', {})
+    log('purchase fail!')
+  }, () => {
+    sceneMessageBus.emit('transactionSuccess', {})
+    log('transaction success!')
+  },
+  () => {
+    sceneMessageBus.emit('transactionFail', {})
+    log('transaction fail!')
+  }
 )
 
-function closeUnlockUI(success: any) {
-  if (success) {
-    engine.removeEntity(cube)
-  }
-}
+engine.addEntity(lock)
