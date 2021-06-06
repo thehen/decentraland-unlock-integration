@@ -1,12 +1,13 @@
 import { getUserAccount } from '@decentraland/EthereumController'
 import { RequestManager, ContractFactory, TransactionReceipt, fromWei, BigNumber, fromDecimal } from "eth-connect"
 import { getProvider, Provider } from '@decentraland/web3-provider'
+import delay from './utils/delay'
 
 import unlockABI from './abis/unlock'
 import erc20ABI from './abis/erc20'
 
 const REFERRER: string = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
-const POLL_FREQ: float = 1000; // ms delay between checking transaction reciept
+const POLL_FREQ: float = 2; // s delay between checking transaction reciept
 const ZERO: string = "0x0000000000000000000000000000000000000000";
 
 let transactionReciepts: { [key: string]: TransactionReceipt } = {};
@@ -59,12 +60,21 @@ export class Lock {
 
         try {
             const hash = await this.contract.purchase(actualAmount, address, REFERRER, data, transactionOptions);
-            await setReciept(hash)
-            return true
+            setReciept(hash)
+            return hash
         } catch (error) {
             log(error)
-            return false
+            return null
         }
+    }
+
+    public waitForTransactionConfirmation = async (hash: string) => {
+        while (transactionReciepts[hash] === null || transactionReciepts[hash] === undefined) {
+            await delay(2000)
+            setReciept(hash)
+        }
+
+        return transactionReciepts[hash]
     }
 
     public getHasValidKey = async () => {
@@ -102,24 +112,3 @@ export class Lock {
 const setReciept = async (hash: string) => {
     transactionReciepts[hash] = await requestManager.eth_getTransactionReceipt(hash)
 }
-
-export class Poll implements ISystem {
-    timeSinceLastCheck = 0;
-    async update(dt: number) {
-        this.timeSinceLastCheck += dt
-        if (this.timeSinceLastCheck > POLL_FREQ) {
-            this.timeSinceLastCheck = 0;
-            for (const hash in transactionReciepts) {
-                if (transactionReciepts[hash] == null) {
-                    await setReciept(hash)
-                    log(transactionReciepts[hash])
-                }
-            }
-        }
-    }
-}
-
-// Add system to engine
-engine.addSystem(new Poll())
-
-
