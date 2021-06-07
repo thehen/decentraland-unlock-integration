@@ -21,3 +21,5 @@ $:  dcl start
 ```
 
 Any dependencies are installed and then the CLI opens the scene in a new browser tab.
+
+To then enable web3, append `?ENABLE_WEB3` to the url.
