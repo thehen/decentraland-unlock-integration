@@ -3,7 +3,7 @@ import { PadLock } from './padlock'
 export let sceneMessageBus = new MessageBus()
 
 const lock = new PadLock(
-  '0x07291E2861dC4e9856f021Ee3561040da9c5d04C',
+  '0xBcb88eA834C300418c503ECE5dC5c9dd2dd6B978',
   'images/unlock-logo-black.png',
   'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.',
   () => {

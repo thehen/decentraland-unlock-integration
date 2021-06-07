@@ -2,6 +2,7 @@ import { getUserAccount } from '@decentraland/EthereumController'
 import { RequestManager, ContractFactory, TransactionReceipt, fromWei, BigNumber, toBigNumber, isBigNumber } from "eth-connect"
 import { getProvider, Provider } from '@decentraland/web3-provider'
 import delay from './utils/delay'
+import { fromDecimals } from './utils/crypto'
 
 import unlockABI from './abis/unlock'
 import erc20ABI from './abis/erc20'
@@ -19,18 +20,6 @@ let address: string
 
 let erc20Factory: ContractFactory
 let erc20Contract: any
-
-/**
- * Inspired from https://github.com/decentraland/eth-connect/blob/2254a2d7a695f5b0deb51b796082d2072b65af86/src/utils/utils.ts#L373
- * @param num
- * @param decimals
- * @returns
- */
-export function fromDecimals(num: number | string, decimals: number) {
-let returnValue = toBigNumber(num).dividedBy(decimals)
-
-return isBigNumber(num) ? returnValue : returnValue.toString(10)
-}
 
 export class Lock {
     private lockAddress: string
