@@ -8,7 +8,8 @@ import unlockABI from './abis/unlock'
 import erc20ABI from './abis/erc20'
 
 const REFERRER: string = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
-const POLL_FREQ: float = 2; // s delay between checking transaction reciept
+const POLL_FREQ: float = 2000;
+const POLL_TIMEOUT: float = 1000000;
 const ZERO: string = "0x0000000000000000000000000000000000000000";
 
 let transactionReciepts: { [key: string]: TransactionReceipt } = {};
@@ -70,9 +71,15 @@ export class Lock {
     }
 
     public waitForTransactionConfirmation = async (hash: string) => {
+        let time = 0
         while (transactionReciepts[hash] === null || transactionReciepts[hash] === undefined) {
-            await delay(2000)
+            await delay(POLL_FREQ)
             setReciept(hash)
+            time += POLL_FREQ
+
+            if (time >= POLL_TIMEOUT) {
+                return null
+            }
         }
 
         return transactionReciepts[hash]

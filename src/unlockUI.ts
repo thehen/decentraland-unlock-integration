@@ -1,5 +1,6 @@
 import * as ui from '@dcl/ui-scene-utils'
 import * as unlock from './unlock'
+import { Lock } from './unlock'
 
 export class UnlockPurchaseUI {
 
@@ -7,22 +8,40 @@ export class UnlockPurchaseUI {
     public logoUrl: string
     public bodyText: string
 
-    private purchasePrompt: ui.CustomPrompt
+    onPurchaseSuccess: () => void
+    onPurchaseFail: () => void
+    onTransactionSuccess: () => void
+    onTransactionFail: () => void
 
-    private unlockFailedUI: UnlockFailedUI
+    private purchasePrompt: ui.CustomPrompt
 
     constructor(
         lock: unlock.Lock,
         logoUrl: string,
-        bodyText: string
+        bodyText: string,
+
+        onPurchaseSuccess: () => void,
+        onPurchaseFail: () => void,
+        onTransactionSuccess: () => void,
+        onTransactionFail: () => void
     ) {
-        this.lock = lock
         this.logoUrl = logoUrl
         this.bodyText = bodyText
+        this.lock = lock
+
+        this.onPurchaseSuccess = onPurchaseSuccess
+        this.onPurchaseFail = onPurchaseFail
+        this.onTransactionSuccess = onTransactionSuccess
+        this.onTransactionFail = onTransactionFail
+
         this.purchasePrompt = new ui.CustomPrompt(ui.PromptStyles.LIGHT, undefined, undefined, true)
 
-        this.unlockFailedUI = new UnlockFailedUI("Purchase Failed", "The purchase failed. Please try again.")
-        this.populatePrompt()
+        this.init()
+    }
+
+    private init = async () => {
+        await this.lock.init()
+        await this.populatePrompt()
     }
 
     private populatePrompt = async () => {
@@ -40,22 +59,23 @@ export class UnlockPurchaseUI {
             async () => {
                 button1.hide()
                 loadingText.show()
-                const hash = await this.lock.purchaseMembership()
+                let hash = null
+                hash = await this.lock.purchaseMembership()
+                this.onPurchaseSuccess()
                 button1.show()
                 loadingText.hide()
                 this.purchasePrompt.hide()
+
                 if (hash !== null) {
-                    // success
-                    const success = await this.lock.waitForTransactionConfirmation(hash)
-                    if (success) {
-                        log("transaction success!")
+                    const reciept = await this.lock.waitForTransactionConfirmation(hash)
+                    if (reciept?.status == '0x1') {
+                        this.onTransactionSuccess()
+                    } else {
+                        this.onTransactionFail()
                     }
                 } else {
-                    // fail
-                    this.unlockFailedUI.show()
+                    this.onPurchaseFail()
                 }
-
-                //onComplete(success)
             },
             ui.ButtonStyles.E
         )
@@ -74,44 +94,3 @@ export class UnlockPurchaseUI {
     }
 }
 
-export class UnlockFailedUI {
-
-    public titleText: string
-    public bodyText: string
-
-    private prompt: ui.CustomPrompt
-
-    constructor(
-        titleText: string,
-        bodyText: string
-    ) {
-        this.titleText = titleText
-        this.bodyText = bodyText
-        this.prompt = new ui.CustomPrompt(ui.PromptStyles.LIGHT, 350, 180, true)
-        this.populatePrompt()
-    }
-
-    private populatePrompt = async () => {
-        this.prompt.addText(this.titleText, 0, 60, new Color4(0.25, 0.25, 0.25, 1), 16)
-        this.prompt.addText(this.bodyText, 0, 30, new Color4(0.5, 0.5, 0.5, 1), 13)
-
-        let button1 = this.prompt.addButton(
-            'Ok',
-            0,
-            -40,
-            async () => {
-                this.prompt.hide()
-            },
-            ui.ButtonStyles.E
-        )
-
-    }
-
-    public show = async () => {
-        this.prompt.show()
-    }
-
-    public hide = async () => {
-        this.prompt.hide()
-    }
-}

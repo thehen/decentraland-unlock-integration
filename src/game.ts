@@ -1,26 +1,36 @@
-import { PadLock } from './padlock'
+import { Lock } from './unlock'
+import { UnlockPurchaseUI } from './unlockUI'
 
-export let sceneMessageBus = new MessageBus()
+executeTask(async () => {
 
-const lock = new PadLock(
-  '0xBcb88eA834C300418c503ECE5dC5c9dd2dd6B978',
-  'images/unlock-logo-black.png',
-  'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.',
-  () => {
-    sceneMessageBus.emit('purchaseSuccess', {})
-    log('purchase success!')
-  },
-  () => {
-    sceneMessageBus.emit('purchaseFail', {})
-    log('purchase fail!')
-  }, () => {
-    sceneMessageBus.emit('transactionSuccess', {})
-    log('transaction success!')
-  },
-  () => {
-    sceneMessageBus.emit('transactionFail', {})
-    log('transaction fail!')
+  const lock = new Lock('0x07291E2861dC4e9856f021Ee3561040da9c5d04C')
+  await lock.init()
+
+  const hasValidKey = await lock.getHasValidKey()
+
+  if (hasValidKey) {
+
+  } else {
+
   }
-)
 
-engine.addEntity(lock)
+  const unlockPurchaseUI = new UnlockPurchaseUI(
+    lock,
+    'images/unlock-logo-black.png',
+    'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.',
+    () => {
+      log('purchase success!')
+    },
+    () => {
+      log('purchase fail!')
+    },
+    () => {
+      log('transaction success!')
+    },
+    () => {
+      log('transaction fail!')
+    }
+  )
+
+  unlockPurchaseUI.show()
+})
