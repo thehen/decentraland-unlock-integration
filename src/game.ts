@@ -3,15 +3,15 @@ import { UnlockPurchaseUI } from './unlockUI'
 
 executeTask(async () => {
 
-  const lock = new Lock('0x07291E2861dC4e9856f021Ee3561040da9c5d04C')
+  const lock = new Lock('0xBcb88eA834C300418c503ECE5dC5c9dd2dd6B978')
   await lock.init()
 
   const hasValidKey = await lock.getHasValidKey()
 
   if (hasValidKey) {
-
+    log("has key")
   } else {
-
+    log("doesn't have key")
   }
 
   const unlockPurchaseUI = new UnlockPurchaseUI(

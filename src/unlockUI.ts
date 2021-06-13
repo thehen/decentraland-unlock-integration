@@ -61,12 +61,12 @@ export class UnlockPurchaseUI {
                 loadingText.show()
                 let hash = null
                 hash = await this.lock.purchaseMembership()
-                this.onPurchaseSuccess()
                 button1.show()
                 loadingText.hide()
                 this.purchasePrompt.hide()
 
                 if (hash !== null) {
+                    this.onPurchaseSuccess()
                     const reciept = await this.lock.waitForTransactionConfirmation(hash)
                     if (reciept?.status == '0x1') {
                         this.onTransactionSuccess()

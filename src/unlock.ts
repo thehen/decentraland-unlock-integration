@@ -65,7 +65,6 @@ export class Lock {
             setReciept(hash)
             return hash
         } catch (error) {
-            log(error)
             return null
         }
     }
@@ -97,7 +96,7 @@ export class Lock {
         }
         else {
             const decimals = await erc20Contract.decimals()
-            keyPrice = fromDecimals(keyPrice, decimals)
+            keyPrice = fromDecimals(keyPrice, 10 ** decimals)
         }
 
         return keyPrice
