@@ -42,5 +42,8 @@
   "bugs": {
     "url": "https://github.com/thehen/decentraland-unlock-integration/issues"
   },
-  "homepage": "https://github.com/thehen/decentraland-unlock-integration#readme"
+  "homepage": "https://github.com/thehen/decentraland-unlock-integration#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }
