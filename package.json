@@ -1,7 +1,7 @@
 {
-  "name": "dcl-project",
+  "name": "@thehen/decentraland-unlock-integration",
   "version": "1.0.0",
-  "description": "My new Decentraland project",
+  "description": "Decentraland Unlock Integration",
   "scripts": {
     "start": "dcl start",
     "build": "build-ecs",
@@ -24,5 +24,23 @@
     "@dcl/ui-scene-utils",
     "@dcl/crypto-scene-utils",
     "@dcl/ecs-scene-utils"
-  ]
+  ],
+  "main": "src/game.ts",
+  "bin": {
+    "decentraland-unlock-integration": "game.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thehen/decentraland-unlock-integration.git"
+  },
+  "keywords": [
+    "unlock",
+    "decentraland"
+  ],
+  "author": "Henry Hoffman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thehen/decentraland-unlock-integration/issues"
+  },
+  "homepage": "https://github.com/thehen/decentraland-unlock-integration#readme"
 }
