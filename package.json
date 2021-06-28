@@ -26,9 +26,6 @@
     "@dcl/ecs-scene-utils"
   ],
   "main": "src/game.ts",
-  "bin": {
-    "decentraland-unlock-integration": "game.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thehen/decentraland-unlock-integration.git"
