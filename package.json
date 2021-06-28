@@ -1,6 +1,6 @@
 {
   "name": "@thehen/decentraland-unlock-integration",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Decentraland Unlock Integration",
   "scripts": {
     "start": "dcl start",
@@ -35,9 +35,12 @@
     "decentraland"
   ],
   "author": "Henry Hoffman",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/thehen/decentraland-unlock-integration/issues"
   },
-  "homepage": "https://github.com/thehen/decentraland-unlock-integration#readme"
+  "homepage": "https://github.com/thehen/decentraland-unlock-integration#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }
