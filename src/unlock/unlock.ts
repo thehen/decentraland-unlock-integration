@@ -1,11 +1,11 @@
 import { getUserAccount } from '@decentraland/EthereumController'
 import { RequestManager, ContractFactory, TransactionReceipt, fromWei, BigNumber, toBigNumber, isBigNumber } from "eth-connect"
 import { getProvider, Provider } from '@decentraland/web3-provider'
-import delay from './utils/delay'
-import { fromDecimals } from './utils/crypto'
+import delay from '../utils/delay'
+import { fromDecimals } from '../utils/crypto'
 
-import unlockABI from './abis/unlock'
-import erc20ABI from './abis/erc20'
+import unlockABI from '../abis/unlock'
+import erc20ABI from '../abis/erc20'
 
 const REFERRER: string = "0xA008D4c1E22A760FF47218659A0ddD934Aa543FD"
 const POLL_FREQ: float = 2000;
