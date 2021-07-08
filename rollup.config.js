@@ -1,3 +1,4 @@
+
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import { terser } from 'rollup-plugin-terser'
@@ -19,7 +20,7 @@ const plugins = [
   commonjs({
     ignoreGlobal: true,
     include: [/node_modules/],
-    namedExports: { '@dcl/ecs-scene-utils' : ['Delay']}
+    namedExports: {}
   }),
 
   PROD && terser({})
@@ -29,11 +30,12 @@ export default {
   input: './src/index.ts',
   context: 'globalThis',
   plugins,
+  external: /(@decentraland\/|@dcl\/|eth-connect)/,
   output: [
     {
       file: './dist/index.js',
-      format: 'umd',
-      name: 'decentraland-unlock-integration',
+      format: 'amd',
+      name: '@thehen/decentraland-unlock-integration',
       sourcemap: true,
       amd: {
         id: '@thehen/decentraland-unlock-integration'

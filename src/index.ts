@@ -1,7 +1,14 @@
-import { Lock } from './unlock/unlock'
-import { UnlockPurchaseUI } from './unlock/unlockUI'
-
 export {
-    Lock,
+    Lock
+} from './unlock/unlock'
+export {
     UnlockPurchaseUI
-}
+} from './unlock/unlockUI'
+export {
+    eventManager,
+    LockInitialised,
+    PurchaseSuccess,
+    PurchaseFail,
+    TransactionSuccess,
+    TransactionFail
+} from './unlock/events'

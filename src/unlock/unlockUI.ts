@@ -1,6 +1,6 @@
 import * as ui from '@dcl/ui-scene-utils'
 import * as unlock from './unlock'
-import { Lock } from './unlock'
+import * as events from "./events"
 
 export class UnlockPurchaseUI {
 
@@ -8,31 +8,16 @@ export class UnlockPurchaseUI {
     public logoUrl: string
     public bodyText: string
 
-    onPurchaseSuccess: () => void
-    onPurchaseFail: () => void
-    onTransactionSuccess: () => void
-    onTransactionFail: () => void
-
     private purchasePrompt: ui.CustomPrompt
 
     constructor(
         lock: unlock.Lock,
         logoUrl: string,
         bodyText: string,
-
-        onPurchaseSuccess: () => void,
-        onPurchaseFail: () => void,
-        onTransactionSuccess: () => void,
-        onTransactionFail: () => void
     ) {
         this.logoUrl = logoUrl
         this.bodyText = bodyText
         this.lock = lock
-
-        this.onPurchaseSuccess = onPurchaseSuccess
-        this.onPurchaseFail = onPurchaseFail
-        this.onTransactionSuccess = onTransactionSuccess
-        this.onTransactionFail = onTransactionFail
 
         this.purchasePrompt = new ui.CustomPrompt(ui.PromptStyles.LIGHT, undefined, undefined, true)
 
@@ -40,7 +25,9 @@ export class UnlockPurchaseUI {
     }
 
     private init = async () => {
-        await this.lock.init()
+        if (!this.lock.isInitialised) {
+            throw new Error("Error: Lock is not initialised! Ensure you subscribe to the LockInitialised event!");
+        }
         await this.populatePrompt()
     }
 
@@ -57,25 +44,30 @@ export class UnlockPurchaseUI {
             0,
             -90,
             async () => {
+
                 button1.hide()
                 loadingText.show()
-                let hash = null
-                hash = await this.lock.purchaseMembership()
-                button1.show()
-                loadingText.hide()
-                this.purchasePrompt.hide()
 
-                if (hash !== null) {
-                    this.onPurchaseSuccess()
-                    const reciept = await this.lock.waitForTransactionConfirmation(hash)
-                    if (reciept?.status == '0x1') {
-                        this.onTransactionSuccess()
-                    } else {
-                        this.onTransactionFail()
+                // TODO: remove code duplication here 
+
+                events.eventManager.addListener(events.PurchaseFail, null, ({ lock }) => {
+                    if (lock == this.lock) {
+                        button1.show()
+                        loadingText.hide()
+                        this.purchasePrompt.hide()
                     }
-                } else {
-                    this.onPurchaseFail()
-                }
+                })
+
+                events.eventManager.addListener(events.PurchaseSuccess, null, ({ lock }) => {
+                    if (lock == this.lock) {
+                        button1.show()
+                        loadingText.hide()
+                        this.purchasePrompt.hide()
+                    }
+                })
+
+                await this.lock.purchaseMembership()
+
             },
             ui.ButtonStyles.E
         )
