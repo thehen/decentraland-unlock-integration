@@ -42,9 +42,13 @@ export class Lock {
         provider = await getProvider()
         requestManager = new ethConnect.RequestManager(provider)
         factory = new ethConnect.ContractFactory(requestManager, unlockABI)
-
         this.contract = await factory.at(this.lockAddress) as any;
-        this.tokenAddress = await this.contract.tokenAddress();
+
+        try {
+            this.tokenAddress = await this.contract.tokenAddress();
+        } catch {
+            throw new Error("Address now found. Is the lock on the correct network?")
+        }
 
         // erc20 contract
         erc20Factory = new ethConnect.ContractFactory(requestManager, erc20ABI)
@@ -52,9 +56,10 @@ export class Lock {
 
         // Initialised event
         let hasValidKey = await this.getHasValidKey()
-        events.eventManager.fireEvent(new events.LockInitialised(this, hasValidKey))
 
         this.isInitialised = true
+        events.eventManager.fireEvent(new events.LockInitialised(this, hasValidKey))
+
     }
 
     public purchaseMembership = async () => {
@@ -75,6 +80,7 @@ export class Lock {
             events.eventManager.fireEvent(new events.PurchaseSuccess(this))
         } catch (error) {
             events.eventManager.fireEvent(new events.PurchaseFail(this))
+            return
         }
 
         // Transaction events
@@ -111,7 +117,7 @@ export class Lock {
                 symbol = await erc20Contract.symbol()
             } catch (e) {
                 symbol = ""
-                throw new Error("Error: Some ERC20 contracts, including DAI do not have the right symbol method.")
+                throw new Error("Some ERC20 contracts, including DAI do not have the right symbol method.")
             }
         }
         return symbol

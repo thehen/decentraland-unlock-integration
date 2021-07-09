@@ -4,7 +4,7 @@ import * as events from "./unlock/events"
 
 const decentralandLock = new Lock('0xBcb88eA834C300418c503ECE5dC5c9dd2dd6B978')
 
-events.eventManager.addListener(events.LockInitialised, null, ({ lock, hasValidKey }) => {
+events.eventManager.addListener(events.LockInitialised, "lockinitialised", ({ lock, hasValidKey }) => {
   if (hasValidKey) {
     log("has key")
   } else {

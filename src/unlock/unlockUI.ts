@@ -26,7 +26,7 @@ export class UnlockPurchaseUI {
 
     private init = async () => {
         if (!this.lock.isInitialised) {
-            throw new Error("Error: Lock is not initialised! Ensure you subscribe to the LockInitialised event!");
+            throw new Error("Lock is not initialised! Ensure you subscribe to the LockInitialised event!");
         }
         await this.populatePrompt()
     }
@@ -39,30 +39,37 @@ export class UnlockPurchaseUI {
         let loadingText = this.purchasePrompt.addText('Loading...', 0, -75, new Color4(0.75, 0.75, 0.75, 1), 12)
         loadingText.hide()
 
-        let button1 = this.purchasePrompt.addButton(
+        let purchaseButton = this.purchasePrompt.addButton(
             'Purchase',
             0,
             -90,
             async () => {
 
-                button1.hide()
+                purchaseButton.hide()
                 loadingText.show()
 
                 // TODO: remove code duplication here 
 
-                events.eventManager.addListener(events.PurchaseFail, null, ({ lock }) => {
+                const failListener = "internal_unlockUIFail"
+                const successListener = "internal_unlockUISuccess"
+
+                events.eventManager.addListener(events.PurchaseFail, null, this.show)
+
+                events.eventManager.addListener(events.PurchaseFail, failListener, ({ lock }) => {
                     if (lock == this.lock) {
-                        button1.show()
+                        purchaseButton.show()
                         loadingText.hide()
                         this.purchasePrompt.hide()
+                        events.eventManager.removeListener(failListener, events.PurchaseFail)
                     }
                 })
 
-                events.eventManager.addListener(events.PurchaseSuccess, null, ({ lock }) => {
+                events.eventManager.addListener(events.PurchaseSuccess, successListener, ({ lock }) => {
                     if (lock == this.lock) {
-                        button1.show()
+                        purchaseButton.show()
                         loadingText.hide()
                         this.purchasePrompt.hide()
+                        events.eventManager.removeListener(successListener, events.PurchaseSuccess)
                     }
                 })
 
