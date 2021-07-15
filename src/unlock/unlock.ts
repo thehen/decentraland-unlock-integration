@@ -25,7 +25,7 @@ let erc20Contract: any
 
 export class Lock {
     public isInitialised: Boolean = false
-    private lockAddress: string
+    readonly lockAddress: string
     private contract: any
 
     private tokenAddress: string = ""

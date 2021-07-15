@@ -9,6 +9,9 @@ export class UnlockPurchaseUI {
     public bodyText: string
 
     private purchasePrompt: ui.CustomPrompt
+    private purchaseButton: ui.CustomPromptButton
+    private loadingText: ui.CustomPromptText
+
 
     constructor(
         lock: unlock.Lock,
@@ -29,6 +32,29 @@ export class UnlockPurchaseUI {
             throw new Error("Lock is not initialised! Ensure you subscribe to the LockInitialised event!");
         }
         await this.populatePrompt()
+
+        events.eventManager.addListener(events.PurchaseFail, "unlockUIFail" + this.lock.lockAddress, ({ lock }) => {
+            if (lock == this.lock) {
+                this.resetAndHidePrompt()
+            }
+        })
+
+        events.eventManager.addListener(events.PurchaseSuccess, "unlockUISuccess" + this.lock.lockAddress, ({ lock }) => {
+            if (lock == this.lock) {
+                this.resetAndHidePrompt()
+            }
+        })
+    }
+
+    private resetAndHidePrompt = async () => {
+        this.purchaseButton.show()
+        this.loadingText.hide()
+        this.purchasePrompt.hide()
+    }
+
+    private showLoadingText = async () => {
+        this.purchaseButton.hide()
+        this.loadingText.show()
     }
 
     private populatePrompt = async () => {
@@ -36,43 +62,15 @@ export class UnlockPurchaseUI {
         this.purchasePrompt.addText(this.bodyText, 0, 30, new Color4(0.5, 0.5, 0.5, 1), 13)
         this.purchasePrompt.addText('Powered by Unlock', 0, -120, new Color4(0.5, 0.5, 0.5, 1), 10)
 
-        let loadingText = this.purchasePrompt.addText('Loading...', 0, -75, new Color4(0.75, 0.75, 0.75, 1), 12)
-        loadingText.hide()
+        this.loadingText = this.purchasePrompt.addText('Loading...', 0, -75, new Color4(0.75, 0.75, 0.75, 1), 12)
+        this.loadingText.hide()
 
-        let purchaseButton = this.purchasePrompt.addButton(
+        this.purchaseButton = this.purchasePrompt.addButton(
             'Purchase',
             0,
             -90,
             async () => {
-
-                purchaseButton.hide()
-                loadingText.show()
-
-                // TODO: remove code duplication here 
-
-                const failListener = "internal_unlockUIFail"
-                const successListener = "internal_unlockUISuccess"
-
-                events.eventManager.addListener(events.PurchaseFail, null, this.show)
-
-                events.eventManager.addListener(events.PurchaseFail, failListener, ({ lock }) => {
-                    if (lock == this.lock) {
-                        purchaseButton.show()
-                        loadingText.hide()
-                        this.purchasePrompt.hide()
-                        events.eventManager.removeListener(failListener, events.PurchaseFail)
-                    }
-                })
-
-                events.eventManager.addListener(events.PurchaseSuccess, successListener, ({ lock }) => {
-                    if (lock == this.lock) {
-                        purchaseButton.show()
-                        loadingText.hide()
-                        this.purchasePrompt.hide()
-                        events.eventManager.removeListener(successListener, events.PurchaseSuccess)
-                    }
-                })
-
+                this.showLoadingText()
                 await this.lock.purchaseMembership()
 
             },
