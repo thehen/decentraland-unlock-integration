@@ -4,6 +4,7 @@ import { getProvider, Provider } from '@decentraland/web3-provider'
 import delay from '../utils/delay'
 import { fromDecimals } from '../utils/crypto'
 import * as events from "./events"
+import * as crypto from '@dcl/crypto-scene-utils'
 
 import unlockABI from '../abis/unlock'
 import erc20ABI from '../abis/erc20'
@@ -20,13 +21,13 @@ let requestManager: ethConnect.RequestManager
 let factory: ethConnect.ContractFactory
 let address: string
 
-let erc20Factory: ethConnect.ContractFactory
-let erc20Contract: any
-
 export class Lock {
     public isInitialised: Boolean = false
     readonly lockAddress: string
     private contract: any
+
+    private erc20Factory: ethConnect.ContractFactory
+    private erc20Contract: any
 
     private tokenAddress: string = ""
 
@@ -51,26 +52,52 @@ export class Lock {
         }
 
         // erc20 contract
-        erc20Factory = new ethConnect.ContractFactory(requestManager, erc20ABI)
-        erc20Contract = await erc20Factory.at(this.tokenAddress) as any;
+        this.erc20Factory = new ethConnect.ContractFactory(requestManager, erc20ABI)
+        this.erc20Contract = await this.erc20Factory.at(this.tokenAddress) as any;
 
-        // Initialised event
         let hasValidKey = await this.getHasValidKey()
 
         this.isInitialised = true
         events.eventManager.fireEvent(new events.LockInitialised(this, hasValidKey))
-
     }
 
     public purchaseMembership = async () => {
         const actualAmount = await this.contract.keyPrice()
         const data = new Array<number>();
 
-        const transactionOptions = {
+        const transactionOptions: any = {
             from: address,
             to: this.lockAddress,
-            value: actualAmount,
         };
+
+        //this.erc20Contract.approve()
+
+        await this.erc20Contract.approve(address, actualAmount)
+
+        //if (crypto.currency.isApproved(this.tokenAddress, address, address)) {
+
+
+        //await crypto.currency.setApproval(this.tokenAddress, address, true, actualAmount)
+        //transactionOptions.gasLimit = 500000
+
+
+
+
+        //}
+        //const approvedAmount = await this.getAllowance()
+        //await this.approveTransfer(actualAmount)
+        /*
+        if (this.tokenAddress && this.tokenAddress !== ZERO) {
+            const approvedAmount = await this.getAllowance()
+            if (!approvedAmount || approvedAmount.lt(actualAmount)) {
+                await this.approveTransfer(actualAmount)
+                // Since we sent the approval transaction, we cannot rely on Ethers to do an estimate, because the computation would fail (since the approval might not have been mined yet)
+                transactionOptions.gasLimit = 500000
+            }
+        } else {
+            transactionOptions.value = actualAmount
+        }
+        */
 
         // Purchase events
         let hash = null
@@ -103,7 +130,7 @@ export class Lock {
             keyPrice = ethConnect.fromWei(keyPrice, 'ether')
         }
         else {
-            const decimals = await erc20Contract.decimals()
+            const decimals = await this.erc20Contract.decimals()
             keyPrice = fromDecimals(keyPrice, 10 ** decimals)
         }
 
@@ -114,7 +141,7 @@ export class Lock {
         let symbol = "ETH"
         if (this.tokenAddress != ZERO) {
             try {
-                symbol = await erc20Contract.symbol()
+                symbol = await this.erc20Contract.symbol()
             } catch (e) {
                 symbol = ""
                 throw new Error("Some ERC20 contracts, including DAI do not have the right symbol method.")
@@ -142,4 +169,20 @@ export class Lock {
         transactionReciepts[hash] = await requestManager.eth_getTransactionReceipt(hash)
     }
 
+
+    private getAllowance = async () => {
+        let amount = '0'
+        try {
+            amount = await this.erc20Contract.allowance(address, this.lockAddress)
+        } catch (e) {
+            // if no amount was allowed, some provider will fail.
+        }
+        return ethConnect.toBigNumber(amount)
+    }
+
+    private approveTransfer = async (actualAmount: float) => {
+        return this.erc20Contract.approve(this.lockAddress, actualAmount)
+    }
+
 }
+

@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/thehen/decentraland-unlock-integration#readme",
   "devDependencies": {
-    "decentraland-ecs": "^6.6.3",
+    "decentraland-ecs": "^6.6.5",
     "eth-connect": "^5.0.0",
     "prettier": "^2.2.1",
     "rollup": "^2.35.1",
@@ -48,6 +48,7 @@
     "dist"
   ],
   "dependencies": {
+    "@dcl/crypto-scene-utils": "^1.1.1",
     "@dcl/ecs-scene-utils": "^1.7.2",
     "@dcl/ui-scene-utils": "^1.8.1"
   }
