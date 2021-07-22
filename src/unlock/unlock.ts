@@ -68,36 +68,20 @@ export class Lock {
         const transactionOptions: any = {
             from: address,
             to: this.lockAddress,
+            value: actualAmount,
         };
 
-        //this.erc20Contract.approve()
-
-        await this.erc20Contract.approve(address, actualAmount)
-
-        //if (crypto.currency.isApproved(this.tokenAddress, address, address)) {
-
-
-        //await crypto.currency.setApproval(this.tokenAddress, address, true, actualAmount)
-        //transactionOptions.gasLimit = 500000
-
-
-
-
-        //}
-        //const approvedAmount = await this.getAllowance()
-        //await this.approveTransfer(actualAmount)
-        /*
-        if (this.tokenAddress && this.tokenAddress !== ZERO) {
-            const approvedAmount = await this.getAllowance()
-            if (!approvedAmount || approvedAmount.lt(actualAmount)) {
-                await this.approveTransfer(actualAmount)
-                // Since we sent the approval transaction, we cannot rely on Ethers to do an estimate, because the computation would fail (since the approval might not have been mined yet)
-                transactionOptions.gasLimit = 500000
+        // Custom token
+        if (this.tokenAddress !== ZERO) {
+            const isApproved = await crypto.currency.isApproved(this.tokenAddress, address, this.lockAddress)
+            let allowance = await crypto.currency.allowance(this.tokenAddress, address, this.lockAddress) as unknown as string
+            if (!isApproved || ethConnect.toBigNumber(allowance).lt(actualAmount)) {
+                await crypto.currency.setApproval(this.tokenAddress, this.lockAddress, true, actualAmount)
             }
+            transactionOptions.gasLimit = 500000
         } else {
             transactionOptions.value = actualAmount
         }
-        */
 
         // Purchase events
         let hash = null
