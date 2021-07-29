@@ -52,10 +52,10 @@ You can easily create and manage locks through the Unlock Dashboard. For more in
 1. Install the Unlock Integration as an npm package. Run this command in your scene's project folder:
 
 ```typescript
-npm i @thehen/decentraland-unlock-integration @dcl/ecs-scene-utils eth-connect -B
+npm i @thehen/decentraland-unlock-integration @dcl/ecs-scene-utils @dcl/crypto-scene-utils @dcl/ui-scene-utils eth-connect -B
 ```
 
-> Note: This command also installs the latest version of the @dcl/ecs-scene-utils and eth-connect libraries, that are dependencies of the crypto utils library
+> Note: This command also installs the latest version of the @dcl/ecs-scene-utils, @dcl/crypto-scene-utils, @dcl/ui-scene-utils and eth-connect libraries, that are dependencies of this library
 
 2. Run `dcl start` or `dcl build` so the dependencies are correctly installed.
 
@@ -154,6 +154,57 @@ unlock.eventManager.addListener(unlock.TransactionSuccess, "transaction success"
 unlock.eventManager.addListener(unlock.TransactionFail, "transaction fail", ({ lock }) => {
     // transaction fail
 })
+```
+
+## Complete example
+
+```typescript
+import * as unlock from '@thehen/decentraland-unlock-integration'
+
+// --- Unlock ---
+
+// Add a lock
+const decentralandLock = new unlock.Lock('0x9625Bc447d23117e22105B77FAC015F6B970f0C0')
+
+// Lock initialised
+unlock.eventManager.addListener(unlock.LockInitialised, "unlockInit", ({ lock, hasValidKey }) => {
+
+  if (hasValidKey) {
+    // already owns key 
+  } else {
+    // doesn't own key
+
+    // Instantiate Unlock UI object
+    const unlockPurchaseUI = new unlock.UnlockPurchaseUI(
+      decentralandLock,
+      'https://raw.githubusercontent.com/thehen/decentraland-unlock-integration/master/images/unlock-logo-black.png',
+      'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.'
+    )
+
+    // Show UI 
+    unlockPurchaseUI.show()
+
+  }
+})
+
+// --- Events ---
+
+unlock.eventManager.addListener(unlock.PurchaseSuccess, "purchase success", ({ lock }) => {
+  log("Purchase success")
+})
+
+unlock.eventManager.addListener(unlock.PurchaseFail, "purchase fail", ({ lock }) => {
+  log("Purchase failed")
+})
+
+unlock.eventManager.addListener(unlock.TransactionSuccess, "transaction success", ({ lock }) => {
+  log("Transaction success")
+})
+
+unlock.eventManager.addListener(unlock.TransactionFail, "transaction fail", ({ lock }) => {
+  log("Transaction failed")
+})
+
 ```
 
 ## Support
