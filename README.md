@@ -21,6 +21,7 @@
   <a href="#adding-the-unlock-library">Adding the Unlock Library</a> •
   <a href="#adding-ui">Adding UI</a> •
   <a href="#listening-for-events">Listening for events</a> •
+  <a href="#complete-example">Complete example</a> •
   <a href="#support">Support</a>
 </p>
 
