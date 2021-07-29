@@ -16,6 +16,7 @@
 <p align="center">
   <a href="#overview">Overview</a> •
   <a href="#live-demo">Live demo</a> •
+  <a href="#example-project">Example project</a> •
   <a href="#features">Features</a> •
   <a href="#create-locks">Create Locks</a> •
   <a href="#adding-the-unlock-library">Adding the Unlock Library</a> •
@@ -37,7 +38,13 @@ Create locks and place them anywhere you’d like to lock content. Users can pur
 
 In the live demo, there's a members-only saloon with a cowboy outside who won't grant access unless you have a membership. Upon buying a membership with 0.1 MANA, you are allowed to enter the saloon.
 
+## Example Project
+
+The quickest way to get started with the Unlock Protocol Decentraland Integration is to [download the example project and follow the readme](https://github.com/thehen/unlock-decentraland-example-project).
+
+
 ## Features 
+
 - Accept payment in MANA or any other ERC20 token
 - Set a limited or unlimited number of keys 
 - Set duration for how long the keys last for
