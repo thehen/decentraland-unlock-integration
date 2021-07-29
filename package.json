@@ -1,6 +1,6 @@
 {
   "name": "@thehen/decentraland-unlock-integration",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Decentraland Unlock Integration",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
