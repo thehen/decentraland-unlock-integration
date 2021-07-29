@@ -41,7 +41,6 @@ In the live demo, there's a members-only saloon with a cowboy outside who won't 
 - Set a limited or unlimited number of keys 
 - Set duration for how long the keys last for
 - Native UI utilising the Decentraland UI library
-- Decoupled code using Decentraland custom events
 
 ## Create Locks
 
