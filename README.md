@@ -14,14 +14,15 @@
 </div>
 
 <p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="#how-to-use">How To Use</a> •
-  <a href="#download">Download</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
-  <a href="#license">License</a>
+  <a href="#overview">Overview</a> •
+  <a href="#live-demo">Live demo</a> •
+  <a href="#features">Features</a> •
+  <a href="#create-locks">Create Locks</a> •
+  <a href="#adding-the-unlock-library">Adding the Unlock Library</a> •
+  <a href="#adding-ui">Adding UI</a> •
+  <a href="#listening-for-events">Listening for events</a> •
+  <a href="#support">Support</a>
 </p>
-
 
 ![demo](https://github.com/thehen/decentraland-unlock-integration/blob/readme/docs/img/demo.gif?raw=true)
 
@@ -39,7 +40,7 @@ In the live demo, there's a members-only saloon with a cowboy outside who won't 
 - Accept payment in MANA or any other ERC20 token
 - Set a limited or unlimited number of keys 
 - Set duration for how long the keys last for
-- Native feeling UI utilising the Decentraland UI library
+- Native UI utilising the Decentraland UI library
 - Decoupled code using Decentraland custom events
 
 ## Create Locks
@@ -59,6 +60,8 @@ npm i @thehen/decentraland-unlock-integration @dcl/ecs-scene-utils eth-connect -
 
 2. Run `dcl start` or `dcl build` so the dependencies are correctly installed.
 
+> Note: After running `dcl start` you must have Metamask or Dapper open and you must add the following string to the end of the URL: `&ENABLE_WEB3`
+
 3. Import the library into the scene's script. Add this line at the start of your `game.ts` file, or any other TypeScript files that require it:
 
 ```typescript
@@ -67,46 +70,46 @@ import * as unlock from '@thehen/decentraland-unlock-integration'
 
 ## Adding Locks to Scenes
 
-Create a new `Lock` instance as follows:
+Instantiate a new `Lock` object as follows:
 
 ```typescript
-export const decentralandLock = new unlock.Lock('0xF0cF2b4f9AfA8701Ca8d87502E14be5C855eA70e')
+const decentralandLock = new unlock.Lock('0xF0cF2b4f9AfA8701Ca8d87502E14be5C855eA70e')
 ```
 
-Next we add a listener to the Unlock event manager which listens for `LockInitialised` event:
+Next we add a listener to the Unlock event manager which listens for the `LockInitialised` event:
 
 ```typescript
 unlock.eventManager.addListener(unlock.LockInitialised, "unlockInit", ({ lock, hasValidKey }) => {
     /// Lock initialised!
 })
 ```
-To quickly test whether purchasing a lock works, we can call the `purchaseMembership` function after the lock is initialised:
+To test whether purchasing a lock works, we can call the `purchaseMembership` function after the lock is initialised:
 ```typescript
 unlock.eventManager.addListener(unlock.LockInitialised, "unlockInit", ({ lock, hasValidKey }) => {
     /// Lock initialised!
     decentralandLock.purchaseMembership()
 })
 ```
-Congratulations! You've added your first lock to Decentraland! Now let's make it look good.
+Congratulations! You've added your first lock to Decentraland! Now let's add some UI.
 
 ## Adding UI
 
 ![ui](https://github.com/thehen/decentraland-unlock-integration/blob/readme/docs/img/ui.jpg?raw=true)
 
-To show a popup UI, you first need to create an `UnlockPurchaseUI` object. :
+To show a popup UI, you first need to create an `UnlockPurchaseUI` object with the following properties:
 
-- `lock`: The lock instance
+- `lock`: The lock object instance
 - `logoUrl`: The image url for the logo image
 - `bodyText`: The body text to display on the popup
 
 ```typescript
 unlockPurchaseUI = new unlock.UnlockPurchaseUI(
-    decentralandLock,
-    'https://raw.githubusercontent.com/thehen/decentraland-unlock-integration/master/images/unlock-logo-black.png',
-    'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.'
+  decentralandLock,
+  'https://raw.githubusercontent.com/thehen/decentraland-unlock-integration/master/images/unlock-logo-black.png',
+  'Unlock lets you easily offer paid memberships to your \n website or application. On this website, members \n can leave comments and participate in discussion. \n It is free to try! Just click "purchase" below.'
 )
 ```
-ddfddgfdfg
+To show and hide the UI, you can call the `show` and `hide` functions on the `UnlockPurchaseUI` object:
 
 ```typescript
 unlockPurchaseUI.show()
@@ -118,4 +121,42 @@ unlockPurchaseUI.hide()
 
 ## Listening for events
 
+After a purchase has begun, you can listen for [custom events](https://docs.decentraland.org/development-guide/custom-events/) and have your scene respond accordingly. These are the events available:
 
+- `LockInitialised`: lock is initialised 
+- `PurchaseSuccess`: purchase was completed successfully
+- `PurchaseFail`: purchase failed
+- `TransactionSuccess`: transaction was successful
+- `TransactionFail`: transaction failed
+
+```typescript
+// Events
+
+unlock.eventManager.addListener(unlock.LockInitialised, "init", ({ lock, hasValidKey }) => {
+    if (hasValidKey) {
+        // already owns key
+    } else {
+        // doesn't own key
+    }
+})
+
+unlock.eventManager.addListener(unlock.PurchaseSuccess, "purchase success", ({ lock }) => {
+    // purchase successful
+})
+
+unlock.eventManager.addListener(unlock.PurchaseFail, "purchase fail", ({ lock }) => {
+    // purchase fail
+})
+
+unlock.eventManager.addListener(unlock.TransactionSuccess, "transaction success", ({ lock }) => {
+    // transaction success
+})
+
+unlock.eventManager.addListener(unlock.TransactionFail, "transaction fail", ({ lock }) => {
+    // transaction fail
+})
+```
+
+## Support
+
+If you have any questions, feel free to join the [Unlock Discord Server](https://docs.unlock-protocol.com/creators/plugins-and-integrations/discord) and I'll be happy to help.
