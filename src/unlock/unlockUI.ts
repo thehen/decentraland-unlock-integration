@@ -44,6 +44,13 @@ export class UnlockPurchaseUI {
                 this.resetAndHidePrompt()
             }
         })
+
+        events.eventManager.addListener(events.ApprovalFail, "approvalFail" + this.lock.lockAddress, ({ lock }) => {
+            if (lock == this.lock) {
+                this.resetAndHidePrompt()
+            }
+        })
+
     }
 
     private resetAndHidePrompt = async () => {

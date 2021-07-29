@@ -44,3 +44,19 @@ export class TransactionFail {
         this.lock = _lock
     }
 }
+
+@EventConstructor()
+export class ApprovalSuccess {
+    lock: Lock
+    constructor(public _lock: Lock) {
+        this.lock = _lock
+    }
+}
+
+@EventConstructor()
+export class ApprovalFail {
+    lock: Lock
+    constructor(public _lock: Lock) {
+        this.lock = _lock
+    }
+}

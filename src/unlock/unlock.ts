@@ -76,7 +76,13 @@ export class Lock {
             const isApproved = await crypto.currency.isApproved(this.tokenAddress, address, this.lockAddress)
             let allowance = await crypto.currency.allowance(this.tokenAddress, address, this.lockAddress) as unknown as string
             if (!isApproved || ethConnect.toBigNumber(allowance).lt(actualAmount)) {
-                await crypto.currency.setApproval(this.tokenAddress, this.lockAddress, true, actualAmount)
+                try {
+                    await crypto.currency.setApproval(this.tokenAddress, this.lockAddress, true, actualAmount)
+                    events.eventManager.fireEvent(new events.ApprovalSuccess(this))
+                } catch (error) {
+                    events.eventManager.fireEvent(new events.ApprovalFail(this))
+                    return
+                }
             }
             transactionOptions.gasLimit = 500000
         } else {
