@@ -1,6 +1,6 @@
 import { Lock } from './unlock'
 
-// Initiate event manager
+// Initialise event manager
 export const eventManager = new EventManager()
 
 @EventConstructor()

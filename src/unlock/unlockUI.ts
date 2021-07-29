@@ -27,6 +27,9 @@ export class UnlockPurchaseUI {
         this.init()
     }
 
+    /**
+     * Initialise the prompt
+     */
     private init = async () => {
         if (!this.lock.isInitialised) {
             throw new Error("Lock is not initialised! Ensure you subscribe to the LockInitialised event!");
@@ -53,17 +56,26 @@ export class UnlockPurchaseUI {
 
     }
 
+    /**
+     * Restores the prompt to default state and hides it
+     */
     private resetAndHidePrompt = async () => {
         this.purchaseButton.show()
         this.loadingText.hide()
         this.purchasePrompt.hide()
     }
 
+    /**
+     * Hides the purchase button and shows loading text
+     */
     private showLoadingText = async () => {
         this.purchaseButton.hide()
         this.loadingText.show()
     }
 
+    /**
+     * Populates the prompt with content
+     */
     private populatePrompt = async () => {
         this.purchasePrompt.addIcon(this.logoUrl, 0, 120, 200, 43);
         this.purchasePrompt.addText(this.bodyText, 0, 30, new Color4(0.5, 0.5, 0.5, 1), 13)
@@ -89,10 +101,16 @@ export class UnlockPurchaseUI {
         this.purchasePrompt.addText('Price: ' + price + ' ' + symbol, 0, -20, new Color4(0.75, 0.75, 0.75, 1), 18)
     }
 
+    /**
+     * Show the prompt
+     */
     public show = async () => {
         this.purchasePrompt.show()
     }
 
+    /**
+     * Hide the prompt
+     */
     public hide = async () => {
         this.purchasePrompt.hide()
     }

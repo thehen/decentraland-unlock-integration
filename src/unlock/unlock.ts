@@ -21,6 +21,7 @@ let requestManager: ethConnect.RequestManager
 let factory: ethConnect.ContractFactory
 let address: string
 
+/** Class representing a lock. */
 export class Lock {
     public isInitialised: Boolean = false
     readonly lockAddress: string
@@ -38,7 +39,10 @@ export class Lock {
         this.init()
     }
 
-    public init = async () => {
+    /**
+     * Initialises the lock
+     */
+    private init = async () => {
         address = await ethereumController.getUserAccount()
         provider = await getProvider()
         requestManager = new ethConnect.RequestManager(provider)
@@ -61,6 +65,9 @@ export class Lock {
         events.eventManager.fireEvent(new events.LockInitialised(this, hasValidKey))
     }
 
+    /**
+     * Purchase a membership
+     */
     public purchaseMembership = async () => {
         const actualAmount = await this.contract.keyPrice()
         const data = new Array<number>();
@@ -109,10 +116,18 @@ export class Lock {
         }
     }
 
+    /**
+     * Check if the user has a valid key
+     * @returns { boolean } - is key valid
+     */
     public getHasValidKey = async () => {
         return await this.contract.getHasValidKey(address)
     }
 
+    /**
+     * Gets the price of the lock 
+     * @returns { any } - the price in token currency
+     */
     public getPrice = async () => {
         let keyPrice = await this.contract.keyPrice()
 
@@ -127,6 +142,10 @@ export class Lock {
         return keyPrice
     }
 
+    /**
+     * Gets the token symbol
+     * @returns { string } - the token symbol 
+     */
     public getSymbol = async () => {
         let symbol = "ETH"
         if (this.tokenAddress != ZERO) {
@@ -140,6 +159,11 @@ export class Lock {
         return symbol
     }
 
+    /**
+     * Async function to poll a transaction and wait for completion or failure
+     * @param { string } hash the transaction hash
+     * @returns transaction reciept
+     */
     private waitForTransactionConfirmation = async (hash: string) => {
         let time = 0
         while (transactionReciepts[hash] === null || transactionReciepts[hash] === undefined) {
@@ -155,23 +179,12 @@ export class Lock {
         return transactionReciepts[hash]
     }
 
+    /**
+     * Updates the transaction receipt object with latest reciept from hash
+     * @param { string } hash the transaction hash
+     */
     private setReciept = async (hash: string) => {
         transactionReciepts[hash] = await requestManager.eth_getTransactionReceipt(hash)
-    }
-
-
-    private getAllowance = async () => {
-        let amount = '0'
-        try {
-            amount = await this.erc20Contract.allowance(address, this.lockAddress)
-        } catch (e) {
-            // if no amount was allowed, some provider will fail.
-        }
-        return ethConnect.toBigNumber(amount)
-    }
-
-    private approveTransfer = async (actualAmount: float) => {
-        return this.erc20Contract.approve(this.lockAddress, actualAmount)
     }
 
 }
