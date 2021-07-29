@@ -51,7 +51,7 @@ You can easily create and manage locks through the Unlock Dashboard. For more in
 
 1. Install the Unlock Integration as an npm package. Run this command in your scene's project folder:
 
-```
+```typescript
 npm i @thehen/decentraland-unlock-integration @dcl/ecs-scene-utils eth-connect -B
 ```
 
@@ -61,7 +61,7 @@ npm i @thehen/decentraland-unlock-integration @dcl/ecs-scene-utils eth-connect -
 
 3. Import the library into the scene's script. Add this line at the start of your `game.ts` file, or any other TypeScript files that require it:
 
-```
+```typescript
 import * as unlock from '@thehen/decentraland-unlock-integration'
 ```
 
@@ -69,19 +69,19 @@ import * as unlock from '@thehen/decentraland-unlock-integration'
 
 Create a new `Lock` instance as follows:
 
-```
+```typescript
 export const decentralandLock = new unlock.Lock('0xF0cF2b4f9AfA8701Ca8d87502E14be5C855eA70e')
 ```
 
 Next we add a listener to the Unlock event manager which listens for `LockInitialised` event:
 
-```
+```typescript
 unlock.eventManager.addListener(unlock.LockInitialised, "unlockInit", ({ lock, hasValidKey }) => {
     /// Lock initialised!
 })
 ```
 To quickly test whether purchasing a lock works, we can call the `purchaseMembership` function after the lock is initialised:
-```
+```typescript
 unlock.eventManager.addListener(unlock.LockInitialised, "unlockInit", ({ lock, hasValidKey }) => {
     /// Lock initialised!
     decentralandLock.purchaseMembership()
@@ -99,7 +99,7 @@ To show a popup UI, you first need to create an `UnlockPurchaseUI` object. :
 - `logoUrl`: The image url for the logo image
 - `bodyText`: The body text to display on the popup
 
-```
+```typescript
 unlockPurchaseUI = new unlock.UnlockPurchaseUI(
     decentralandLock,
     'https://raw.githubusercontent.com/thehen/decentraland-unlock-integration/master/images/unlock-logo-black.png',
@@ -107,43 +107,15 @@ unlockPurchaseUI = new unlock.UnlockPurchaseUI(
 )
 ```
 ddfddgfdfg
-```
+
+```typescript
 unlockPurchaseUI.show()
 ```
 
-```
+```typescript
 unlockPurchaseUI.hide()
 ```
 
 ## Listening for events
 
 
-
-<br><br><br><br><br><br><br><br>
-
-
-## Unlock Protocol Decentraland Integration
-
-A simple interactive scene with a locked door preventing access to a building. Once a membership is purchased through Unlock Protocol, you are granted access to the building.
-
-## Try it out
-
-**Install the CLI**
-
-Download and install the Decentraland CLI by running the following command:
-
-```bash
-npm i -g decentraland
-```
-
-**Previewing the scene**
-
-Download this example and navigate to its directory, then run:
-
-```
-$:  dcl start
-```
-
-Any dependencies are installed and then the CLI opens the scene in a new browser tab.
-
-To then enable web3, append `?ENABLE_WEB3` to the url.
